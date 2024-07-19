@@ -153,4 +153,23 @@ func TestStart(t *testing.T) {
 
 		assert.Equal(t, "-\b\\\b", string(data))
 	})
+
+	t.Run("calling start on a stopped spinner should restart", func(t *testing.T) {
+		buf := &bytes.Buffer{}
+		s := spinner.New(spinner.Config{
+			Writer:    buf,
+			FrameRate: time.Millisecond * 5,
+		})
+
+		s.Start(context.Background())
+		s.Stop()
+		s.Start(context.Background())
+		time.Sleep(6 * time.Millisecond)
+		s.Stop()
+
+		data, err := io.ReadAll(buf)
+		assert.NoError(t, err)
+
+		assert.Equal(t, "-\b-\b\\\b", string(data))
+	})
 }
