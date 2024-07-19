@@ -59,6 +59,7 @@ func TestSpinnerWorksAsync(t *testing.T) {
 	go func() {
 		s.Start()
 		time.Sleep(10 * time.Millisecond)
+		close(done)
 	}()
 
 	select {

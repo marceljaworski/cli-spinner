@@ -49,7 +49,11 @@ func (s *Spinner) Start() {
 	done := make(chan struct{})
 	s.doneCh = done
 	s.lock.Unlock()
+
+	ticker := time.NewTicker(s.frameRate)
+
 	go func() {
+		defer ticker.Stop()
 		for {
 			for _, frame := range s.frames {
 				b := byte(frame)
@@ -60,7 +64,7 @@ func (s *Spinner) Start() {
 					s.writer.Write([]byte("\b"))
 					close(done)
 					return
-				case <-time.After(s.frameRate):
+				case <-ticker.C:
 					break
 				}
 
@@ -71,7 +75,7 @@ func (s *Spinner) Start() {
 }
 
 func (s *Spinner) Stop() {
-	if s.isRunning() {
+	if !s.isRunning() {
 		return
 	}
 	s.cancelFunc()
