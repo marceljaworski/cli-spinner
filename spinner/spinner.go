@@ -63,6 +63,9 @@ func (s *Spinner) Start(ctx context.Context) {
 }
 
 func (s *Spinner) Stop() {
+	if s.doneCh == nil {
+		return
+	}
 	s.cancelFunc()
 	<-s.doneCh
 }

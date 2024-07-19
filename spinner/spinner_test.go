@@ -123,3 +123,13 @@ func TestSpinnerDoesNotPrintOnceStopped(t *testing.T) {
 		//Test passed
 	}
 }
+
+func TestStop(t *testing.T) {
+	t.Run("calling stop on non started spinner should do nothing", func(t *testing.T) {
+		s := spinner.New(spinner.Config{
+			Writer:    &bytes.Buffer{},
+			FrameRate: time.Millisecond * 5,
+		})
+		s.Stop()
+	})
+}
