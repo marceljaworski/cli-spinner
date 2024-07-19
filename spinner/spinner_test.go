@@ -133,3 +133,24 @@ func TestStop(t *testing.T) {
 		s.Stop()
 	})
 }
+
+func TestStart(t *testing.T) {
+	t.Run("calling start on a started spinner should do nothng", func(t *testing.T) {
+		buf := &bytes.Buffer{}
+		s := spinner.New(spinner.Config{
+			Writer:    buf,
+			FrameRate: time.Millisecond * 5,
+		})
+
+		s.Start(context.Background())
+		s.Start(context.Background())
+
+		time.Sleep(6 * time.Millisecond)
+		s.Stop()
+
+		data, err := io.ReadAll(buf)
+		assert.NoError(t, err)
+
+		assert.Equal(t, "-\b\\\b", string(data))
+	})
+}
