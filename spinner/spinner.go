@@ -34,17 +34,20 @@ func New(cfg Config) *Spinner {
 }
 
 func (s *Spinner) Start(ctx context.Context) {
-	for _, frame := range s.frames {
-		b := byte(frame)
-		s.writer.Write([]byte{b})
+	for {
+		for _, frame := range s.frames {
+			b := byte(frame)
+			s.writer.Write([]byte{b})
 
-		select {
-		case <-ctx.Done():
-			return
-		case <-time.After(s.frameRate):
-			break
+			select {
+			case <-ctx.Done():
+				return
+			case <-time.After(s.frameRate):
+				break
+			}
+
+			s.writer.Write([]byte("\b"))
 		}
-
-		s.writer.Write([]byte("\b"))
 	}
+
 }

@@ -2,6 +2,6 @@
 
 Terminal-UI Spinner
 
-run test `go test ./spinner -v`
+run tests `go test ./spinner` `go test ./spinner -v`
 
-[Dreams of Code Tutorial](https://github.com/dreamsofcode-io/terminal-ui)
+[Dreams of Code Tutorial](https://www.youtube.com/watch?v=LguOA6HS1es)
