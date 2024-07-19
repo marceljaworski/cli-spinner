@@ -72,4 +72,5 @@ func (s *Spinner) Stop() {
 	}
 	s.cancelFunc()
 	<-s.doneCh
+	s.doneCh = nil
 }
