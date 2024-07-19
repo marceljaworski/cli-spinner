@@ -36,6 +36,10 @@ func New(cfg Config) *Spinner {
 }
 
 func (s *Spinner) Start(ctx context.Context) {
+	if s.doneCh != nil {
+		return
+	}
+
 	ctx, cancel := context.WithCancel(ctx)
 	s.cancelFunc = cancel
 
