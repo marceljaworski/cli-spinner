@@ -8,9 +8,11 @@ import (
 )
 
 type Spinner struct {
-	writer    io.Writer
-	frameRate time.Duration
-	frames    []rune
+	writer     io.Writer
+	frameRate  time.Duration
+	frames     []rune
+	cancelFunc context.CancelFunc
+	doneCh     chan struct{}
 }
 
 type Config struct {
@@ -34,6 +36,11 @@ func New(cfg Config) *Spinner {
 }
 
 func (s *Spinner) Start(ctx context.Context) {
+	ctx, cancel := context.WithCancel(ctx)
+	s.cancelFunc = cancel
+
+	done := make(chan struct{})
+	s.doneCh = done
 	go func() {
 		for {
 			for _, frame := range s.frames {
@@ -43,6 +50,7 @@ func (s *Spinner) Start(ctx context.Context) {
 				select {
 				case <-ctx.Done():
 					s.writer.Write([]byte("\b"))
+					close(done)
 					return
 				case <-time.After(s.frameRate):
 					break
@@ -55,5 +63,6 @@ func (s *Spinner) Start(ctx context.Context) {
 }
 
 func (s *Spinner) Stop() {
-
+	s.cancelFunc()
+	<-s.doneCh
 }
