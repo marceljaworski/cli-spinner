@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"log"
 	"time"
 
@@ -11,11 +10,8 @@ import (
 func main() {
 	s := spinner.New(spinner.Config{})
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
 	log.Println("Starting the spinner")
-	s.Start(ctx)
+	s.Start()
 
 	time.Sleep(time.Second * 5)
 	s.Stop()

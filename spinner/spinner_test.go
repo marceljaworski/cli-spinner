@@ -2,7 +2,6 @@ package spinner_test
 
 import (
 	"bytes"
-	"context"
 	"io"
 	"testing"
 	"time"
@@ -37,10 +36,7 @@ func TestSpinnerStart(t *testing.T) {
 				FrameRate: time.Millisecond * 20,
 			})
 
-			ctx, cancel := context.WithCancel(context.Background())
-			defer cancel()
-
-			s.Start(ctx)
+			s.Start()
 			time.Sleep(tc.duration)
 			s.Stop()
 
@@ -58,14 +54,11 @@ func TestSpinnerWorksAsync(t *testing.T) {
 		FrameRate: time.Millisecond * 5,
 	})
 
-	ctx, cancel := context.WithCancel(context.Background())
-
 	done := make(chan struct{})
 
 	go func() {
-		s.Start(ctx)
+		s.Start()
 		time.Sleep(10 * time.Millisecond)
-		cancel()
 	}()
 
 	select {
@@ -84,10 +77,7 @@ func TestWaitingAfterStop(t *testing.T) {
 		FrameRate: time.Millisecond * 20,
 	})
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	s.Start(ctx)
+	s.Start()
 	time.Sleep(time.Millisecond * 35)
 	s.Stop()
 	time.Sleep(time.Millisecond * 10)
@@ -104,13 +94,10 @@ func TestSpinnerDoesNotPrintOnceStopped(t *testing.T) {
 		FrameRate: time.Millisecond * 5,
 	})
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
 	done := make(chan struct{})
 
 	go func() {
-		s.Start(ctx)
+		s.Start()
 		time.Sleep(10 * time.Millisecond)
 		s.Stop()
 		close(done)
@@ -142,8 +129,8 @@ func TestStart(t *testing.T) {
 			FrameRate: time.Millisecond * 5,
 		})
 
-		s.Start(context.Background())
-		s.Start(context.Background())
+		s.Start()
+		s.Start()
 
 		time.Sleep(6 * time.Millisecond)
 		s.Stop()
@@ -161,9 +148,9 @@ func TestStart(t *testing.T) {
 			FrameRate: time.Millisecond * 5,
 		})
 
-		s.Start(context.Background())
+		s.Start()
 		s.Stop()
-		s.Start(context.Background())
+		s.Start()
 		time.Sleep(6 * time.Millisecond)
 		s.Stop()
 
