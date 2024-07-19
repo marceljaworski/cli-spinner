@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 	"os"
+	"sync"
 	"time"
 )
 
@@ -13,6 +14,7 @@ type Spinner struct {
 	frames     []rune
 	cancelFunc context.CancelFunc
 	doneCh     chan struct{}
+	lock       sync.RWMutex
 }
 
 type Config struct {
@@ -35,16 +37,18 @@ func New(cfg Config) *Spinner {
 	return s
 }
 
-func (s *Spinner) Start(ctx context.Context) {
-	if s.doneCh != nil {
+func (s *Spinner) Start() {
+	if s.isRunning() {
 		return
 	}
 
-	ctx, cancel := context.WithCancel(ctx)
+	s.lock.Lock()
+	ctx, cancel := context.WithCancel(context.Background())
 	s.cancelFunc = cancel
 
 	done := make(chan struct{})
 	s.doneCh = done
+	s.lock.Unlock()
 	go func() {
 		for {
 			for _, frame := range s.frames {
@@ -67,10 +71,20 @@ func (s *Spinner) Start(ctx context.Context) {
 }
 
 func (s *Spinner) Stop() {
-	if s.doneCh == nil {
+	if s.isRunning() {
 		return
 	}
 	s.cancelFunc()
 	<-s.doneCh
+
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
 	s.doneCh = nil
+}
+
+func (s *Spinner) isRunning() bool {
+	s.lock.RLock()
+	defer s.lock.RUnlock()
+	return s.doneCh != nil
 }
